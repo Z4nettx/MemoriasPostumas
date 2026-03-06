@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -9,9 +9,11 @@
 </head>
 
 <body>
+
     <header>
         <h1>Memórias Póstumas de Brás Cubas - Machado de Assis</h1>
     </header>
+
     <div class="custom-shape-divider-top-1772754144">
         <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
             <path
@@ -25,15 +27,16 @@
                 class="shape-fill"></path>
         </svg>
     </div>
+
     <main>
         <div class="main-row">
             <aside>
                 <div>
                     <h2>Você já imaginou escrever suas memórias depois de morrer?</h2>
-                    <h3>E mais: <em>dedicar seu livro ao verme que primeiro roeu as frias carnes do seu cadáver?</em></h3>
+                    <h3>E mais: <em>dedicar seu livro ao verme que primeiro roeu as frias carnes do seu cadáver?</em>
+                    </h3>
                 </div>
                 <p>
-            
                     Pois foi exatamente isso que fez Brás Cubas, o narrador de Memórias Póstumas.
                     Livre das convenções dos vivos, ele revisita sua própria vida com ironia e sinceridade brutal.
                 </p>
@@ -42,7 +45,7 @@
                 <div id="lapide">
                     <div>
                         <h4>Brás Cubas</h4>
-                        <p><em>“Aqui jaz quem viveu sem grandes feitos e morreu com tempo para contá-los.”</em></p>
+                        <p><em>"Aqui jaz quem viveu sem grandes feitos e morreu com tempo para contá-los."</em></p>
                     </div>
                 </div>
                 <img src="img/arvoreseca.png" alt="" id="arvore">
@@ -53,20 +56,489 @@
         </div>
     </main>
 
-    <!-- Modal FORA do main para o fixed funcionar corretamente -->
+    <!-- ============================================================
+         SEÇÃO PARALLAX 1 — A DEDICATÓRIA
+         Estrutura de camadas (do fundo para frente):
+           .px-bg       → fundo (speed 0.15 — move pouco)
+           .px-névoa    → névoa  (speed 0.25)
+           .px-lapide   → lápide (speed 0.40)
+           .px-particulas → canvas de partículas (speed 0.30)
+           .px-texto    → texto  (speed 0.55 — move mais)
+    ============================================================ -->
+    <div class="px-cena" id="px-dedicatoria">
+
+        <!-- Camada 0: fundo de pedra/escuridão -->
+        <div class="px-layer px-bg" data-speed="0.15" id="px-bg-1">
+            <!-- SVG de textura de pedra gerado inline — sem imagem externa -->
+            <svg class="px-pedra-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <defs>
+                    <filter id="f-granulado">
+                        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" />
+                        <feColorMatrix type="saturate" values="0" />
+                        <feBlend in="SourceGraphic" mode="multiply" />
+                    </filter>
+                    <pattern id="p-tijolos" x="0" y="0" width="120" height="80" patternUnits="userSpaceOnUse">
+                        <rect width="120" height="80" fill="#0c0c0c" />
+                        <rect x="2" y="2" width="56" height="36" rx="1" fill="#131313" stroke="#1d1d1d"
+                            stroke-width="1" />
+                        <rect x="62" y="2" width="56" height="36" rx="1" fill="#111" stroke="#1d1d1d"
+                            stroke-width="1" />
+                        <rect x="2" y="42" width="56" height="36" rx="1" fill="#121212" stroke="#1d1d1d"
+                            stroke-width="1" />
+                        <rect x="62" y="42" width="56" height="36" rx="1" fill="#141414" stroke="#1d1d1d"
+                            stroke-width="1" />
+                    </pattern>
+                    <radialGradient id="rg-vinheta1" cx="50%" cy="50%" r="70%">
+                        <stop offset="0%" stop-color="transparent" />
+                        <stop offset="100%" stop-color="#000" stop-opacity="0.88" />
+                    </radialGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#p-tijolos)" filter="url(#f-granulado)" opacity="0.9" />
+                <rect width="100%" height="100%" fill="url(#rg-vinheta1)" />
+            </svg>
+        </div>
+
+        <!-- Camada 1: névoa pulsante -->
+        <div class="px-layer px-névoa" data-speed="0.25"></div>
+
+        <!-- Camada 2: canvas de partículas animadas (poeira/névoa) -->
+        <canvas class="px-layer px-canvas" data-speed="0.30" id="px-canvas-1"></canvas>
+
+        <!-- Camada 3: lápide + card de texto lado a lado -->
+        <div class="px-layer px-texto-wrap" data-speed="0.45">
+            <div class="px-duo px-reveal" id="px-txt-1">
+
+                <!-- Lápide SVG ao lado esquerdo do card -->
+                <div class="px-lapide-lado">
+                    <svg class="px-lapide-svg" viewBox="0 0 300 430" xmlns="http://www.w3.org/2000/svg">
+                        <!-- sombra no chão -->
+                        <ellipse cx="150" cy="424" rx="95" ry="9" fill="#000" opacity="0.55" />
+                        <!-- corpo principal da lápide -->
+                        <path
+                            d="M42,185 Q42,58 150,18 Q258,58 258,185 L258,402 Q258,414 246,414 L54,414 Q42,414 42,402 Z"
+                            fill="#1a1816" stroke="#302810" stroke-width="2" />
+                        <!-- detalhe entalhado interno -->
+                        <path
+                            d="M62,192 Q62,76 150,44 Q238,76 238,192 L238,394 Q238,402 230,402 L70,402 Q62,402 62,394 Z"
+                            fill="none" stroke="#2a2410" stroke-width="1.2" opacity="0.5" />
+                        <!-- ornamento: cruz topo -->
+                        <line x1="150" y1="26" x2="150" y2="94" stroke="#b89b5e" stroke-width="2.5" opacity="0.75" />
+                        <line x1="118" y1="55" x2="182" y2="55" stroke="#b89b5e" stroke-width="2.5" opacity="0.75" />
+                        <!-- florões nos cantos -->
+                        <circle cx="82" cy="205" r="3.5" fill="#b89b5e" opacity="0.45" />
+                        <circle cx="218" cy="205" r="3.5" fill="#b89b5e" opacity="0.45" />
+                        <circle cx="82" cy="385" r="3.5" fill="#b89b5e" opacity="0.45" />
+                        <circle cx="218" cy="385" r="3.5" fill="#b89b5e" opacity="0.45" />
+                        <!-- linha divisória dupla -->
+                        <line x1="78" y1="236" x2="222" y2="236" stroke="#b89b5e" stroke-width="1.2" opacity="0.55" />
+                        <line x1="78" y1="240" x2="222" y2="240" stroke="#b89b5e" stroke-width="0.5" opacity="0.28" />
+                        <!-- nome -->
+                        <text x="150" y="272" text-anchor="middle" font-family="Cinzel, serif" font-size="17"
+                            fill="#c8a84a" opacity="0.9" letter-spacing="3.5">BRÁS CUBAS</text>
+                        <!-- datas -->
+                        <text x="150" y="300" text-anchor="middle" font-family="Merriweather, serif" font-size="11"
+                            fill="#8a7848" opacity="0.65" font-style="italic">1805 — 1869</text>
+                        <!-- epitáfio -->
+                        <text x="150" y="345" text-anchor="middle" font-family="Merriweather, serif" font-size="9.5"
+                            fill="#7a6840" opacity="0.55" font-style="italic">Defunto Autor</text>
+                        <!-- barra base -->
+                        <rect x="95" y="402" width="110" height="3.5" rx="1.5" fill="#302810" opacity="0.7" />
+                    </svg>
+                </div>
+
+                <!-- Card da dedicatória à direita -->
+                <div class="px-texto-bloco">
+                    <div class="px-ornato-linha">
+                        <span class="px-traço"></span>
+                        <span class="px-losango">◆</span>
+                        <span class="px-traço"></span>
+                    </div>
+                    <span class="px-label">Dedicatória</span>
+                    <blockquote class="px-dedicatoria">
+                        Ao verme que primeiro roeu<br>
+                        as frias carnes do meu cadáver<br>
+                        <em>dedico estas memórias póstumas.</em>
+                    </blockquote>
+                    <p class="px-narrador">
+                        — Começo estas memórias não pelo nascimento,<br>
+                        mas pela morte. Pois só o morto tem<br>
+                        liberdade suficiente para ser honesto.
+                    </p>
+                    <div class="px-ornato-linha">
+                        <span class="px-traço"></span>
+                        <span class="px-losango">◆</span>
+                        <span class="px-traço"></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div><!-- fim #px-dedicatoria -->
+
+
+    <!-- Divisor ondulado entre as duas seções parallax -->
+    <div class="px-divisor">
+        <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,80 L0,80 Z" fill="#110e08" />
+        </svg>
+    </div>
+
+
+    <!-- ============================================================
+         SEÇÃO PARALLAX 2 — O DEFUNTO AUTOR
+         Camadas:
+           .px-bg       → fundo papel envelhecido (speed 0.12)
+           .px-páginas  → livro/páginas SVG       (speed 0.38)
+           .px-frases   → fragmentos flutuantes   (speed 0.50)
+           .px-texto    → texto central           (speed 0.60)
+    ============================================================ -->
+    <div class="px-cena" id="px-defunto">
+
+        <!-- Camada 0: fundo papel antigo -->
+        <div class="px-layer px-bg" data-speed="0.12" id="px-bg-2">
+            <svg class="px-papel-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <defs>
+                    <filter id="f-papel">
+                        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch" />
+                        <feColorMatrix type="matrix" values="0.28 0.28 0.28 0 0.16
+                                    0.28 0.28 0.28 0 0.12
+                                    0.28 0.28 0.28 0 0.07
+                                    0    0    0    1 0" />
+                        <feBlend in="SourceGraphic" mode="multiply" />
+                    </filter>
+                    <radialGradient id="rg-papel" cx="50%" cy="45%" r="58%">
+                        <stop offset="0%" stop-color="#241d12" />
+                        <stop offset="100%" stop-color="#0c0a06" />
+                    </radialGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#rg-papel)" />
+                <rect width="100%" height="100%" filter="url(#f-papel)" opacity="0.38" />
+                <!-- pauta de papel antigo -->
+                <line x1="0" y1="18%" x2="100%" y2="18%" stroke="#3a3020" stroke-width="0.6" opacity="0.18" />
+                <line x1="0" y1="36%" x2="100%" y2="36%" stroke="#3a3020" stroke-width="0.6" opacity="0.18" />
+                <line x1="0" y1="54%" x2="100%" y2="54%" stroke="#3a3020" stroke-width="0.6" opacity="0.18" />
+                <line x1="0" y1="72%" x2="100%" y2="72%" stroke="#3a3020" stroke-width="0.6" opacity="0.18" />
+                <line x1="0" y1="90%" x2="100%" y2="90%" stroke="#3a3020" stroke-width="0.6" opacity="0.18" />
+                <!-- margem vertical esquerda tipo caderno -->
+                <line x1="12%" y1="0" x2="12%" y2="100%" stroke="#5a2020" stroke-width="0.8" opacity="0.12" />
+            </svg>
+        </div>
+
+        <!-- Camada 1: livro aberto SVG -->
+        <div class="px-layer px-páginas-wrap" data-speed="0.38">
+            <svg class="px-livro-svg" viewBox="0 0 580 390" xmlns="http://www.w3.org/2000/svg">
+                <!-- sombra projetada -->
+                <ellipse cx="290" cy="384" rx="210" ry="11" fill="#000" opacity="0.45" />
+                <!-- página esquerda -->
+                <path d="M18,18 Q18,8 28,8 L278,8 L278,365 Q160,355 18,365 Z" fill="#ede0c4" stroke="#8a7848"
+                    stroke-width="1.5" />
+                <!-- linhas de texto pág esquerda -->
+                <line x1="42" y1="55" x2="252" y2="55" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="72" x2="252" y2="72" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="89" x2="230" y2="89" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="106" x2="252" y2="106" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="123" x2="210" y2="123" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="140" x2="252" y2="140" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="157" x2="240" y2="157" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="174" x2="252" y2="174" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="191" x2="220" y2="191" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="208" x2="252" y2="208" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="225" x2="195" y2="225" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="242" x2="252" y2="242" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="42" y1="259" x2="235" y2="259" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <!-- capital decorativo -->
+                <rect x="38" y="26" width="44" height="44" rx="3" fill="#d4bc70" opacity="0.28" />
+                <text x="54" y="62" font-family="Cinzel,serif" font-size="30" fill="#7a5c18" opacity="0.55">M</text>
+                <!-- número de página -->
+                <text x="148" y="350" text-anchor="middle" font-family="Merriweather,serif" font-size="9" fill="#8a7848"
+                    opacity="0.5">— I —</text>
+                <!-- lombada -->
+                <rect x="274" y="8" width="26" height="357" fill="#3e2e14" rx="2" />
+                <line x1="287" y1="8" x2="287" y2="365" stroke="#5e4a22" stroke-width="1.2" opacity="0.45" />
+                <!-- página direita -->
+                <path d="M300,8 L542,8 Q552,8 552,18 L552,365 Q410,355 300,365 Z" fill="#e8d8b8" stroke="#8a7848"
+                    stroke-width="1.5" />
+                <!-- linhas texto pág direita -->
+                <line x1="322" y1="55" x2="530" y2="55" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="72" x2="530" y2="72" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="89" x2="508" y2="89" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="106" x2="530" y2="106" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="123" x2="490" y2="123" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="140" x2="530" y2="140" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="157" x2="515" y2="157" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="174" x2="530" y2="174" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="191" x2="500" y2="191" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="208" x2="530" y2="208" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="225" x2="475" y2="225" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="242" x2="530" y2="242" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <line x1="322" y1="259" x2="512" y2="259" stroke="#c4ae84" stroke-width="0.9" opacity="0.55" />
+                <!-- capital dir -->
+                <rect x="318" y="26" width="44" height="44" rx="3" fill="#d4bc70" opacity="0.28" />
+                <text x="334" y="62" font-family="Cinzel,serif" font-size="30" fill="#7a5c18" opacity="0.55">P</text>
+                <!-- número página dir -->
+                <text x="435" y="350" text-anchor="middle" font-family="Merriweather,serif" font-size="9" fill="#8a7848"
+                    opacity="0.5">— II —</text>
+                <!-- título no cabeçalho dir -->
+                <text x="435" y="28" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#7a5c18"
+                    opacity="0.45" letter-spacing="2.5">MEMÓRIAS PÓSTUMAS</text>
+                <!-- marcador de página (ribbon) -->
+                <path d="M525,8 L535,8 L535,80 L530,75 L525,80 Z" fill="#8a2020" opacity="0.55" />
+            </svg>
+        </div>
+
+        <!-- Camada 2: fragmentos de frases flutuando (injetados por JS) -->
+        <div class="px-layer px-frases-wrap" data-speed="0.50" id="px-frases"></div>
+
+        <!-- Camada 3: texto central com fade-in por scroll -->
+        <div class="px-layer px-texto-wrap" data-speed="0.60">
+            <div class="px-texto-bloco px-texto-dir px-reveal" id="px-txt-2">
+                <div class="px-ornato-linha">
+                    <span class="px-traço"></span>
+                    <span class="px-losango">◆</span>
+                    <span class="px-traço"></span>
+                </div>
+                <h2 class="px-titulo">O Defunto Autor</h2>
+                <p class="px-corpo">
+                    Brás Cubas escreve depois de morto.<br>
+                    Livre das convenções sociais e da vaidade dos vivos,<br>
+                    ele narra sua vida com ironia, fracassos<br>
+                    e reflexões sobre a existência.
+                </p>
+                <div class="px-citacao-wrap">
+                    <span class="px-aspas">&#8220;</span>
+                    <p class="px-citacao">
+                        Algum tempo hesitei se devia abrir estas memórias<br>
+                        pelo princípio ou pelo fim, isto é,<br>
+                        se poria em primeiro lugar o meu nascimento ou a minha morte.
+                    </p>
+                    <span class="px-aspas px-aspas-fim">&#8221;</span>
+                </div>
+                <p class="px-assinatura">— Machado de Assis, 1881</p>
+                <div class="px-ornato-linha">
+                    <span class="px-traço"></span>
+                    <span class="px-losango">◆</span>
+                    <span class="px-traço"></span>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- fim #px-defunto -->
+
+
+    <!-- ============================================================
+         SEÇÃO 3 — LINHA DO TEMPO DE BRÁS CUBAS
+         O fundo é fixo (position sticky via JS) enquanto a cena
+         está visível. Os eventos ficam no fluxo normal da página.
+    ============================================================ -->
+    <div class="px-cena px-cena--alta" id="px-timeline">
+
+        <!-- Fundo fixo: não é px-layer, fica preso via CSS position:sticky -->
+        <div class="tl-bg-fixo">
+            <svg class="px-papel-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <defs>
+                    <filter id="f-pergaminho">
+                        <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="5" stitchTiles="stitch" />
+                        <feColorMatrix type="matrix" values="0.22 0.22 0.22 0 0.12
+                                    0.22 0.22 0.22 0 0.09
+                                    0.22 0.22 0.22 0 0.05
+                                    0    0    0    1  0" />
+                        <feBlend in="SourceGraphic" mode="multiply" />
+                    </filter>
+                    <linearGradient id="lg-tl-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#0c0a06" />
+                        <stop offset="40%" stop-color="#1a1408" />
+                        <stop offset="100%" stop-color="#0a0806" />
+                    </linearGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#lg-tl-bg)" />
+                <rect width="100%" height="100%" filter="url(#f-pergaminho)" opacity="0.28" />
+            </svg>
+        </div>
+
+        <!-- Fio da vida: também fixo enquanto a cena está visível -->
+        <div class="tl-fio-wrap">
+            <div class="tl-fio"></div>
+        </div>
+
+        <!-- Conteúdo no fluxo normal — sem parallax de camada -->
+        <div class="tl-container">
+
+            <!-- Cabeçalho da linha do tempo -->
+            <div class="tl-header px-reveal">
+                <div class="px-ornato-linha">
+                    <span class="px-traço"></span>
+                    <span class="px-losango">◆</span>
+                    <span class="px-traço"></span>
+                </div>
+                <h2 class="tl-titulo">Linha do Tempo</h2>
+                <p class="tl-subtitulo">
+                    <em>"Começo pelo fim."</em> — narrada postumamente, como convém a um defunto autor.
+                </p>
+                <div class="px-ornato-linha">
+                    <span class="px-traço"></span>
+                    <span class="px-losango">◆</span>
+                    <span class="px-traço"></span>
+                </div>
+            </div>
+
+            <!-- Os eventos, alternando esquerda/direita -->
+
+            <div class="tl-evento tl-direita px-reveal" data-speed-item="0.30">
+                <div class="tl-bolha">
+                    <span class="tl-ano">1869</span>
+                    <div class="tl-ponto"></div>
+                </div>
+                <div class="tl-card">
+                    <span class="tl-tag tl-tag--morte">Morte</span>
+                    <h3>A Partida</h3>
+                    <p>Brás Cubas morre aos 64 anos, de uma pneumonia contraída por vaidade — quis exibir-se na varanda
+                        em dia frio. Sem filhos. Sem obra. Sem saudades a lamentar.</p>
+                    <span class="tl-ironia">"Não tive filhos, não transmiti a nenhuma criatura o legado da nossa
+                        miséria."</span>
+                </div>
+            </div>
+
+            <div class="tl-evento tl-esquerda px-reveal" data-speed-item="0.38">
+                <div class="tl-bolha">
+                    <span class="tl-ano">1860</span>
+                    <div class="tl-ponto"></div>
+                </div>
+                <div class="tl-card">
+                    <span class="tl-tag tl-tag--politica">Política</span>
+                    <h3>O Emplasto Brás Cubas</h3>
+                    <p>Já maduro, Brás Cubas sonha em inventar um medicamento revolucionário — o Emplasto — que o
+                        tornaria famoso. O projeto nunca sai do papel. A glória, adiada para sempre.</p>
+                    <span class="tl-ironia">"A ideia era grandiosa. A execução, inexistente."</span>
+                </div>
+            </div>
+
+            <div class="tl-evento tl-direita px-reveal" data-speed-item="0.32">
+                <div class="tl-bolha">
+                    <span class="tl-ano">1855</span>
+                    <div class="tl-ponto"></div>
+                </div>
+                <div class="tl-card">
+                    <span class="tl-tag tl-tag--amor">Amor</span>
+                    <h3>Nhã-loló e o Casamento Perdido</h3>
+                    <p>Virgília, seu grande amor de juventude, já é casada com outro. Brás Cubas fica noivo de Nhã-loló
+                        por conveniência. Ela morre antes do casamento. Ele, levemente aliviado.</p>
+                    <span class="tl-ironia">"A morte dela me poupou do casamento. Não sei se agradeço."</span>
+                </div>
+            </div>
+
+            <div class="tl-evento tl-esquerda px-reveal" data-speed-item="0.40">
+                <div class="tl-bolha">
+                    <span class="tl-ano">1842</span>
+                    <div class="tl-ponto"></div>
+                </div>
+                <div class="tl-card">
+                    <span class="tl-tag tl-tag--amor">Amor</span>
+                    <h3>Virgília — O Adultério Elegante</h3>
+                    <p>Virgília, que deveria ter se casado com ele, torna-se sua amante. O caso dura anos, com a
+                        cumplicidade discreta da sociedade carioca. O amor, proibido, é o mais vívido da sua vida.</p>
+                    <span class="tl-ironia">"Amei-a muito, e mal."</span>
+                </div>
+            </div>
+
+            <div class="tl-evento tl-direita px-reveal" data-speed-item="0.34">
+                <div class="tl-bolha">
+                    <span class="tl-ano">1830</span>
+                    <div class="tl-ponto"></div>
+                </div>
+                <div class="tl-card">
+                    <span class="tl-tag tl-tag--politica">Política</span>
+                    <h3>A Carreira Medíocre</h3>
+                    <p>Retorna da Europa com diploma de bacharel e nenhum talento especial. Tenta a política, o
+                        jornalismo, a advocacia. Em tudo, medíocre. Em tudo, satisfeito consigo mesmo.</p>
+                    <span class="tl-ironia">"Era um homem de mérito. O mérito era pequeno, mas era seu."</span>
+                </div>
+            </div>
+
+            <div class="tl-evento tl-esquerda px-reveal" data-speed-item="0.38">
+                <div class="tl-bolha">
+                    <span class="tl-ano">1822</span>
+                    <div class="tl-ponto"></div>
+                </div>
+                <div class="tl-card">
+                    <span class="tl-tag tl-tag--juventude">Juventude</span>
+                    <h3>Coimbra e a Europa</h3>
+                    <p>Enviado pelo pai para estudar em Coimbra. Estuda pouco. Aproveita muito. A Europa o ensina que a
+                        vaidade é universal e que os vícios têm melhor endereço do lado de lá.</p>
+                    <span class="tl-ironia">"Fui à Europa buscar sabedoria. Trouxe apenas francês e um chapéu
+                        novo."</span>
+                </div>
+            </div>
+
+            <div class="tl-evento tl-direita px-reveal" data-speed-item="0.32">
+                <div class="tl-bolha">
+                    <span class="tl-ano">1815</span>
+                    <div class="tl-ponto"></div>
+                </div>
+                <div class="tl-card">
+                    <span class="tl-tag tl-tag--juventude">Juventude</span>
+                    <h3>A Meninice Corrompida</h3>
+                    <p>Filho de família rica do Rio de Janeiro. Criado com mimos e sem disciplina. Aprende cedo que o
+                        dinheiro substitui o caráter. Marceline, a escrava, é sua primeira vítima involuntária.</p>
+                    <span class="tl-ironia">"Fui um menino travesso, um estudante peralta — e daí?"</span>
+                </div>
+            </div>
+
+            <div class="tl-evento tl-esquerda px-reveal" data-speed-item="0.36">
+                <div class="tl-bolha">
+                    <span class="tl-ano">1805</span>
+                    <div class="tl-ponto"></div>
+                </div>
+                <div class="tl-card tl-card--inicio">
+                    <span class="tl-tag tl-tag--nascimento">Nascimento</span>
+                    <h3>O Começo — que é o Fim</h3>
+                    <p>Nasce no Rio de Janeiro, num sobrado da Rua de Matacavalos. Família abastada. O mundo o recebe
+                        sem saber que um dia ele o narraria com a imparcialidade de quem já morreu.</p>
+                    <span class="tl-ironia">"Nasci. Isso foi um erro que levei a vida toda para não corrigir."</span>
+                </div>
+            </div>
+
+            <!-- Rodapé da linha -->
+            <div class="tl-footer px-reveal">
+                <div class="tl-ponto tl-ponto--base"></div>
+                <p class="tl-epitafio">
+                    <em>"No balanço final, não herdei nada, não conquistei nada,<br>
+                        não transmiti nada. Saí desta vida como vim: de mãos vazias."</em>
+                </p>
+                <span class="tl-assinatura">— Brás Cubas, Defunto Autor</span>
+            </div>
+
+        </div><!-- fim .tl-container -->
+
+    </div><!-- fim #px-timeline -->
+
+    <!-- Divisor após a timeline -->
+    <div class="px-divisor">
+        <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M0,20 C360,70 1080,0 1440,50 L1440,80 L0,80 Z" fill="#0a0806" />
+        </svg>
+    </div>
+
+    <!-- Modal -->
     <div class="modal">
         <p id="texto-modal">
             <span class="linha">Ao verme que primeiro roeu as frias carnes do meu cadáver,</span>
             <span class="linha bold">dedico essas memórias póstumas</span>
         </p>
     </div>
+
+    <!-- Caveiras flutuantes -->
     <div class="caveiras">
         <img src="img/caveira.png" alt="">
         <img src="img/caveira.png" alt="">
         <img src="img/caveira.png" alt="">
         <img src="img/caveira.png" alt="">
         <img src="img/caveira.png" alt="">
+        <img src="img/caveira.png" alt="">
+        <img src="img/caveira.png" alt="">
+        <img src="img/caveira.png" alt="">
     </div>
+
     <footer></footer>
     <script src="script.js"></script>
 </body>

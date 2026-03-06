@@ -6,18 +6,31 @@
     box-sizing: border-box;
 }
 
+/* overflow-x só no html — no body causaria scrollbar dupla */
+html {
+    overflow-x: hidden;
+}
+
 :root {
     --cor-fundo: #1a1a1a;
     --cor-texto: #e8e0c8;
     --cor-destaque-2: #b89b5e;
+    /* parallax palette */
+    --px-ouro: #b89b5e;
+    --px-ouro-cl: #d4c080;
+    --px-marfim: #e8dcc4;
+    --px-sépia: #8a7848;
+    --px-pedra: #141414;
+    --px-sombra: rgba(0, 0, 0, 0.72);
 }
 
 body {
-    font-family: 'Cinzel', serif; 
+    font-family: 'Cinzel', serif;
     background: radial-gradient(circle, #111111c7, #000000),
-    url(img/brascubas.png) top center / cover;
+        url(img/brascubas.png) top center / cover;
     color: #fff;
 }
+
 header {
     padding: 1rem;
     text-align: center;
@@ -25,6 +38,7 @@ header {
     z-index: 1;
     text-shadow: 1px 1px 3px var(--cor-destaque-2);
 }
+
 .custom-shape-divider-top-1772754144 {
     position: absolute;
     top: 0;
@@ -45,6 +59,7 @@ header {
 .custom-shape-divider-top-1772754144 .shape-fill {
     fill: #111;
 }
+
 main {
     display: flex;
     flex-direction: column;
@@ -52,6 +67,7 @@ main {
     min-height: 100vh;
     font-family: 'Merriweather', serif;
 }
+
 .main-row {
     display: flex;
     justify-content: space-around;
@@ -59,6 +75,7 @@ main {
     min-height: 75vh;
     font-family: 'Merriweather', serif;
 }
+
 .modal {
     display: none;
     position: fixed;
@@ -76,7 +93,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.6em;
-    font-size: 2rem;
+    font-size: 1.5rem;
     line-height: 1.7;
     color: var(--cor-texto);
 }
@@ -85,6 +102,7 @@ main {
     font-weight: 700;
     color: var(--cor-destaque-2);
 }
+
 aside {
     width: 40%;
     height: 100%;
@@ -95,18 +113,22 @@ aside {
     place-items: start;
     justify-content: space-around;
 }
+
 aside h2 {
     font-family: 'Cinzel', serif !important;
-    text-shadow: 1px 1px 30px #fff; 
+    text-shadow: 1px 1px 30px #fff;
 }
+
 aside div {
     width: 80%;
 }
+
 aside p {
     letter-spacing: .05ch;
     text-align: justify;
     width: 80%;
 }
+
 section {
     width: 50%;
     height: 100%;
@@ -115,6 +137,7 @@ section {
     position: relative;
     overflow: hidden;
 }
+
 #arvore {
     position: fixed;
     rotate: -120deg;
@@ -123,6 +146,7 @@ section {
     right: -10%;
     filter: drop-shadow(1px 1px 3px rgba(10, 0, 0, 0.5));
 }
+
 #lapide {
     background: url(img/lapide.png) center center no-repeat;
     min-height: 60vh;
@@ -133,8 +157,8 @@ section {
     justify-content: center;
     transform: scale(1.3);
     user-select: none;
-
 }
+
 #lapide div {
     width: 30%;
     height: 40%;
@@ -142,16 +166,19 @@ section {
     flex-direction: column;
     gap: 1rem;
 }
-#lapide h4, #lapide p {
-    /* position: fixed; */
+
+#lapide h4,
+#lapide p {
     text-align: center;
     color: var(--cor-fundo);
     font-weight: bold;
     text-shadow: 1px 1px 10px #000;
 }
+
 #lapide p {
     font-size: .8rem;
 }
+
 .caveiras {
     position: fixed;
     inset: 0;
@@ -168,7 +195,883 @@ section {
     object-fit: cover;
     pointer-events: all;
 }
+
 ::selection {
     background-color: var(--cor-destaque-2);
     color: #000;
+}
+
+
+/* ================================================================
+   PARALLAX — estrutura geral
+   Cada .px-cena é uma tela completa com overflow hidden.
+   As .px-layer são absolutas e se movem via transform: translateY()
+   controlado por JavaScript ao scroll.
+   A "profundidade" vem de data-speed: 0 = fixo, 1 = move igual ao scroll.
+   ================================================================ */
+
+.px-cena {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.px-layer {
+    position: absolute;
+    top: -15%;
+    left: 0;
+    width: 100%;
+    height: 130%;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.px-texto-wrap {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.px-texto-wrap:has(.px-texto-dir) {
+    justify-content: flex-start;
+    padding-left: clamp(1rem, 8vw, 10rem);
+}
+
+/* ── FUNDO SEÇÃO 1 (pedra) ── */
+.px-pedra-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ── NÉVOA pulsante (seção 1) ── */
+.px-névoa {
+    background:
+        radial-gradient(ellipse 75% 45% at 28% 62%, rgba(184, 155, 94, 0.05) 0%, transparent 68%),
+        radial-gradient(ellipse 55% 65% at 72% 38%, rgba(90, 80, 50, 0.07) 0%, transparent 58%);
+    animation: px-pulsa 9s ease-in-out infinite alternate;
+    mix-blend-mode: screen;
+    pointer-events: none;
+}
+
+@keyframes px-pulsa {
+    from {
+        opacity: 0.35;
+        transform: scale(1) translateY(0);
+    }
+
+    to {
+        opacity: 0.75;
+        transform: scale(1.05) translateY(-12px);
+    }
+}
+
+/* ── LÁPIDE SVG (seção 1) ── */
+.px-lapide-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.px-lapide-svg {
+    width: clamp(140px, 20vw, 280px);
+    height: auto;
+    filter:
+        drop-shadow(0 18px 55px rgba(0, 0, 0, 0.92)) drop-shadow(0 0 28px rgba(184, 155, 94, 0.12));
+    animation: px-brilho-lapide 14s ease-in-out infinite alternate;
+}
+
+@keyframes px-brilho-lapide {
+    from {
+        filter: drop-shadow(0 18px 55px rgba(0, 0, 0, 0.92)) drop-shadow(0 0 20px rgba(184, 155, 94, 0.08));
+    }
+
+    to {
+        filter: drop-shadow(0 24px 75px rgba(0, 0, 0, 0.96)) drop-shadow(0 0 44px rgba(184, 155, 94, 0.22));
+    }
+}
+
+/* ── CANVAS de partículas ── */
+.px-canvas {
+    opacity: 0.55;
+    mix-blend-mode: screen;
+}
+
+/* ── FUNDO SEÇÃO 2 (papel) ── */
+.px-papel-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ── LIVRO SVG (seção 2) ── */
+.px-páginas-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.px-livro-svg {
+    width: clamp(280px, 48vw, 580px);
+    height: auto;
+    filter:
+        drop-shadow(0 20px 60px rgba(0, 0, 0, 0.88)) drop-shadow(0 0 40px rgba(184, 155, 94, 0.1));
+    animation: px-flutuação-livro 10s ease-in-out infinite alternate;
+    transform-origin: center bottom;
+}
+
+@keyframes px-flutuação-livro {
+    from {
+        transform: translateY(0) rotate(-0.8deg);
+    }
+
+    to {
+        transform: translateY(-14px) rotate(0.8deg);
+    }
+}
+
+/* ── FRAGMENTOS DE FRASES (seção 2) ── */
+.px-frases-wrap {
+    overflow: hidden;
+}
+
+.px-frase {
+    position: absolute;
+    font-family: 'Merriweather', serif;
+    font-style: italic;
+    color: var(--px-ouro);
+    opacity: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    text-shadow: 0 0 18px rgba(184, 155, 94, 0.3);
+    animation: px-deriva linear infinite;
+}
+
+@keyframes px-deriva {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-100vh);
+    }
+}
+
+/* ================================================================
+   BLOCOS DE TEXTO DAS SEÇÕES
+   ================================================================ */
+
+/* ── Layout duo: lápide + card lado a lado (seção 1) ── */
+.px-duo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.px-lapide-lado {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+}
+
+.px-lapide-lado .px-lapide-svg {
+    width: clamp(160px, 22vw, 320px);
+    height: auto;
+    filter:
+        drop-shadow(0 18px 50px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 26px rgba(184, 155, 94, 0.14));
+    animation: px-brilho-lapide 14s ease-in-out infinite alternate;
+}
+
+.px-duo .px-texto-bloco {
+    margin-left: 0;
+}
+
+/* Container do texto — caixa com borda ornamental */
+.px-texto-bloco {
+    text-align: center;
+    max-width: min(560px, 88vw);
+    padding: 2.2rem 2.8rem;
+    border: 1px solid rgba(184, 155, 94, 0.22);
+    outline: 1px solid rgba(184, 155, 94, 0.07);
+    outline-offset: 7px;
+    background: rgba(0, 0, 0, 0.58);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    box-shadow:
+        inset 0 0 55px rgba(0, 0, 0, 0.38),
+        0 0 70px rgba(0, 0, 0, 0.55);
+}
+
+.px-texto-dir {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* ── Ornato de linha com losango ── */
+.px-ornato-linha {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 0.5rem 0;
+}
+
+.px-traço {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(184, 155, 94, 0.55), transparent);
+}
+
+.px-losango {
+    font-size: 0.55rem;
+    color: var(--px-ouro);
+    opacity: 0.7;
+}
+
+/* ── Label "Dedicatória" ── */
+.px-label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--px-sépia);
+    margin-bottom: 1.2rem;
+    opacity: 0.75;
+}
+
+/* ── Texto da dedicatória ── */
+.px-dedicatoria {
+    font-family: 'Merriweather', serif;
+    font-size: clamp(1rem, 2.2vw, 1.35rem);
+    font-weight: 300;
+    line-height: 1.9;
+    color: var(--px-marfim);
+    letter-spacing: 0.02em;
+    margin-bottom: 1.4rem;
+    border: none;
+    padding: 0;
+    text-shadow: 0 0 30px rgba(184, 155, 94, 0.18);
+}
+
+.px-dedicatoria em {
+    color: var(--px-ouro);
+    font-style: italic;
+    text-shadow: 0 0 20px rgba(184, 155, 94, 0.35);
+}
+
+/* ── Narrador italicizado ── */
+.px-narrador {
+    font-family: 'Merriweather', serif;
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    font-style: italic;
+    color: rgba(232, 220, 196, 0.6);
+    line-height: 1.85;
+    margin-top: 1rem;
+}
+
+/* ── Título seção 2 ── */
+.px-titulo {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.2rem, 3vw, 1.9rem);
+    font-weight: 400;
+    color: var(--px-ouro);
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 40px rgba(184, 155, 94, 0.4);
+    margin: 0.6rem 0 1.2rem;
+}
+
+/* ── Corpo seção 2 ── */
+.px-corpo {
+    font-family: 'Merriweather', serif;
+    font-size: clamp(0.82rem, 1.6vw, 0.98rem);
+    font-weight: 300;
+    line-height: 2;
+    color: rgba(232, 220, 196, 0.82);
+    letter-spacing: 0.03em;
+    margin-bottom: 1.4rem;
+}
+
+/* ── Citação com aspas ornamentais ── */
+.px-citacao-wrap {
+    position: relative;
+    padding: 0.8rem 1.4rem;
+    border-left: 2px solid rgba(184, 155, 94, 0.35);
+    margin: 1rem 0;
+    text-align: left;
+}
+
+.px-aspas {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5rem;
+    line-height: 0;
+    position: absolute;
+    top: 1.2rem;
+    left: 0.3rem;
+    color: var(--px-ouro);
+    opacity: 0.35;
+}
+
+.px-aspas-fim {
+    top: auto;
+    bottom: 0.4rem;
+    left: auto;
+    right: 0.3rem;
+}
+
+.px-citacao {
+    font-family: 'Merriweather', serif;
+    font-size: clamp(0.72rem, 1.4vw, 0.86rem);
+    font-style: italic;
+    color: rgba(200, 184, 144, 0.75);
+    line-height: 1.9;
+}
+
+/* ── Assinatura ── */
+.px-assinatura {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--px-sépia);
+    opacity: 0.65;
+    margin-top: 1rem;
+}
+
+/* ================================================================
+   FADE-IN AO SCROLL
+   ================================================================ */
+.px-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+        opacity 1.1s cubic-bezier(0.22, 0.61, 0.36, 1),
+        transform 1.1s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.px-reveal.px-visível {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ── Divisor ondulado entre as duas seções ── */
+.px-divisor {
+    position: relative;
+    width: 100%;
+    line-height: 0;
+    z-index: 2;
+    margin-top: -2px;
+}
+
+.px-divisor svg {
+    display: block;
+    width: 100%;
+}
+
+/* ================================================================
+   LINHA DO TEMPO — px-timeline
+   ================================================================ */
+
+.px-cena--alta {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding: 0;
+    /* Sobrescreve o display:flex do .px-cena que deslocava o conteúdo
+       para a direita. Com display:block, margin:0 auto do .tl-container
+       e .tl-fio-wrap funcionam corretamente e centralizam tudo. */
+    display: block;
+}
+
+/* ── Fundo fixo da timeline (sticky dentro da cena) ── */
+.tl-bg-fixo {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    margin-bottom: -100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tl-bg-fixo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ── Fio vertical central (sticky) ──
+   CORREÇÃO: width e margin espelham o .tl-container para que
+   justify-content: center posicione o fio exatamente sobre a
+   coluna central do grid dos eventos, alinhando-o no desktop. ── */
+.tl-fio-wrap {
+    position: sticky;
+    top: 0;
+    width: min(900px, 92vw);
+    /* mesma largura do .tl-container */
+    margin: 0 auto;
+    /* centraliza igual ao container  */
+    margin-bottom: -100vh;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    /* fio no centro desse wrapper    */
+    pointer-events: none;
+    z-index: 1;
+}
+
+.tl-fio {
+    width: 2px;
+    height: 100%;
+    flex-shrink: 0;
+    /* O gradiente começa transparente nos primeiros 35% da altura do
+       viewport (sticky), cobrindo o espaço ocupado pelo .tl-header,
+       e só aparece a partir daí — evitando sobrepor o título. */
+    background: linear-gradient(to bottom,
+            transparent 0%,
+            transparent 35%,
+            rgba(184, 155, 94, 0.18) 38%,
+            rgba(184, 155, 94, 0.45) 45%,
+            rgba(184, 155, 94, 0.45) 85%,
+            rgba(184, 155, 94, 0.18) 95%,
+            transparent 100%);
+    position: relative;
+}
+
+.tl-fio::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+            transparent,
+            rgba(212, 192, 128, 0.25) 40%,
+            rgba(212, 192, 128, 0.25) 60%,
+            transparent);
+    animation: tl-fio-brilho 6s ease-in-out infinite alternate;
+}
+
+@keyframes tl-fio-brilho {
+    from {
+        opacity: 0.4;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ── Container dos eventos: fluxo normal ── */
+.tl-container {
+    position: relative;
+    width: min(900px, 92vw);
+    margin: 0 auto;
+    padding: 5rem 0 6rem;
+    z-index: 2;
+}
+
+/* ── Cabeçalho e rodapé ── */
+.tl-header,
+.tl-footer {
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+    z-index: 2;
+}
+
+.tl-titulo {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 400;
+    color: var(--px-ouro);
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 50px rgba(184, 155, 94, 0.45);
+    margin: 0.8rem 0 0.5rem;
+}
+
+.tl-subtitulo {
+    font-family: 'Merriweather', serif;
+    font-size: clamp(0.78rem, 1.6vw, 0.95rem);
+    font-style: italic;
+    color: rgba(232, 220, 196, 0.55);
+    margin: 0.5rem 0 1rem;
+}
+
+.tl-footer {
+    margin-top: 4rem;
+    margin-bottom: 0;
+}
+
+.tl-epitafio {
+    font-family: 'Merriweather', serif;
+    font-size: clamp(0.78rem, 1.5vw, 0.92rem);
+    font-style: italic;
+    color: rgba(200, 184, 144, 0.6);
+    line-height: 1.9;
+    margin: 1.2rem 0 0.6rem;
+}
+
+.tl-assinatura {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    color: var(--px-sépia);
+    opacity: 0.6;
+}
+
+.tl-ponto--base {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 auto 1.2rem;
+    position: relative;
+    border: 2px solid rgba(184, 155, 94, 0.5) !important;
+    background: #0c0a06 !important;
+    box-shadow: 0 0 18px rgba(184, 155, 94, 0.25) !important;
+}
+
+/* ── Evento individual ── */
+.tl-evento {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    align-items: start;
+    margin-bottom: 3.2rem;
+    position: relative;
+}
+
+/* Card do lado direito ocupa a 3ª coluna */
+.tl-direita .tl-card {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.tl-direita .tl-bolha {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+}
+
+/* Card do lado esquerdo ocupa a 1ª coluna */
+.tl-esquerda .tl-card {
+    grid-column: 1;
+    grid-row: 1;
+    text-align: right;
+}
+
+.tl-esquerda .tl-bolha {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+}
+
+/* Citação irônica alinha à direita nos cards esquerdos */
+.tl-esquerda .tl-ironia {
+    border-left: none;
+    border-right: 2px solid rgba(184, 155, 94, 0.3);
+    padding-left: 0;
+    padding-right: 0.7rem;
+    text-align: right;
+}
+
+/* ── Bolha com ano e ponto ── */
+.tl-bolha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    padding-top: 0.6rem;
+    z-index: 3;
+}
+
+.tl-ano {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--px-ouro);
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 12px rgba(184, 155, 94, 0.5);
+    white-space: nowrap;
+    background: rgba(10, 8, 6, 0.85);
+    padding: 0.15rem 0.5rem;
+    border: 1px solid rgba(184, 155, 94, 0.25);
+}
+
+.tl-ponto {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--px-ouro);
+    border: 2px solid rgba(184, 155, 94, 0.35);
+    box-shadow:
+        0 0 10px rgba(184, 155, 94, 0.55),
+        0 0 24px rgba(184, 155, 94, 0.2);
+    animation: tl-ponto-pulsa 3s ease-in-out infinite alternate;
+}
+
+@keyframes tl-ponto-pulsa {
+    from {
+        box-shadow: 0 0 8px rgba(184, 155, 94, 0.4), 0 0 18px rgba(184, 155, 94, 0.15);
+    }
+
+    to {
+        box-shadow: 0 0 16px rgba(184, 155, 94, 0.75), 0 0 36px rgba(184, 155, 94, 0.3);
+    }
+}
+
+/* ── Card de cada evento ── */
+.tl-card {
+    max-width: 370px;
+    padding: 1.4rem 1.6rem;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(184, 155, 94, 0.18);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow:
+        inset 0 0 40px rgba(0, 0, 0, 0.3),
+        0 8px 40px rgba(0, 0, 0, 0.6);
+    position: relative;
+    transition: border-color 0.35s ease, box-shadow 0.35s ease;
+    margin: 0 2rem;
+}
+
+.tl-card:hover {
+    border-color: rgba(184, 155, 94, 0.42);
+    box-shadow:
+        inset 0 0 40px rgba(0, 0, 0, 0.3),
+        0 8px 50px rgba(0, 0, 0, 0.7),
+        0 0 30px rgba(184, 155, 94, 0.1);
+}
+
+/* Triângulo apontando para o fio */
+.tl-esquerda .tl-card::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 1.4rem;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid rgba(184, 155, 94, 0.18);
+}
+
+.tl-direita .tl-card::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 1.4rem;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid rgba(184, 155, 94, 0.18);
+}
+
+/* Tag de categoria */
+.tl-tag {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 0.18rem 0.6rem;
+    border-radius: 1px;
+    margin-bottom: 0.6rem;
+}
+
+.tl-tag--morte {
+    background: rgba(80, 20, 20, 0.7);
+    color: #e88888;
+    border: 1px solid rgba(200, 80, 80, 0.3);
+}
+
+.tl-tag--amor {
+    background: rgba(80, 40, 10, 0.7);
+    color: #e8b870;
+    border: 1px solid rgba(200, 140, 60, 0.3);
+}
+
+.tl-tag--politica {
+    background: rgba(20, 40, 20, 0.7);
+    color: #88c888;
+    border: 1px solid rgba(80, 160, 80, 0.3);
+}
+
+.tl-tag--juventude {
+    background: rgba(20, 30, 60, 0.7);
+    color: #88aae8;
+    border: 1px solid rgba(80, 120, 200, 0.3);
+}
+
+.tl-tag--nascimento {
+    background: rgba(60, 50, 10, 0.7);
+    color: var(--px-ouro-cl);
+    border: 1px solid rgba(184, 155, 94, 0.4);
+}
+
+/* Título do evento */
+.tl-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.88rem, 1.8vw, 1.05rem);
+    font-weight: 400;
+    color: var(--px-marfim);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.6rem;
+}
+
+/* Corpo do evento */
+.tl-card p {
+    font-family: 'Merriweather', serif;
+    font-size: clamp(0.72rem, 1.35vw, 0.83rem);
+    font-weight: 300;
+    line-height: 1.85;
+    color: rgba(220, 208, 180, 0.72);
+    margin-bottom: 0.8rem;
+}
+
+/* Frase irônica em itálico dourado */
+.tl-ironia {
+    display: block;
+    font-family: 'Merriweather', serif;
+    font-size: clamp(0.66rem, 1.2vw, 0.76rem);
+    font-style: italic;
+    color: rgba(184, 155, 94, 0.7);
+    border-left: 2px solid rgba(184, 155, 94, 0.3);
+    padding-left: 0.7rem;
+    line-height: 1.7;
+}
+
+/* Card do nascimento — levemente diferente */
+.tl-card--inicio {
+    border-color: rgba(184, 155, 94, 0.32);
+    box-shadow:
+        inset 0 0 50px rgba(0, 0, 0, 0.35),
+        0 8px 50px rgba(0, 0, 0, 0.65),
+        0 0 40px rgba(184, 155, 94, 0.08);
+}
+
+/* ================================================================
+   RESPONSIVIDADE GLOBAL
+   ================================================================ */
+
+/* Tablets e telas médias */
+@media (max-width: 900px) {
+    .px-duo {
+        gap: 1.5rem;
+    }
+
+    .px-lapide-lado .px-lapide-svg {
+        width: clamp(100px, 18vw, 200px);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    /* Seções parallax */
+    .px-cena {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .px-frase {
+        display: none;
+    }
+
+    .px-livro-svg {
+        width: clamp(220px, 80vw, 380px);
+    }
+
+    /* Duo da seção 1: empilha verticalmente */
+    .px-duo {
+        flex-direction: column;
+        gap: 1.4rem;
+    }
+
+    .px-lapide-lado .px-lapide-svg {
+        width: clamp(80px, 25vw, 130px);
+    }
+
+    /* Bloco de texto */
+    .px-texto-bloco {
+        padding: 1.4rem 1.2rem;
+        max-width: 92vw;
+    }
+
+    .px-texto-wrap:has(.px-texto-dir) {
+        padding-left: 1rem;
+    }
+
+    /* Timeline: colapsa para uma coluna só com fio à esquerda */
+    .tl-container {
+        width: 95vw;
+        padding: 3rem 0 4rem;
+    }
+
+    .tl-evento {
+        grid-template-columns: 44px 1fr !important;
+        grid-template-rows: auto;
+    }
+
+    .tl-direita .tl-card,
+    .tl-esquerda .tl-card {
+        grid-column: 2 !important;
+        grid-row: 1;
+        text-align: left;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .tl-direita .tl-bolha,
+    .tl-esquerda .tl-bolha {
+        grid-column: 1 !important;
+        grid-row: 1;
+        justify-self: center;
+        flex-direction: column;
+    }
+
+    .tl-esquerda .tl-ironia {
+        border-left: 2px solid rgba(184, 155, 94, 0.3);
+        border-right: none;
+        padding-left: 0.7rem;
+        padding-right: 0;
+        text-align: left;
+    }
+
+    .tl-card::after {
+        display: none !important;
+    }
+
+    /* No mobile o fio-wrap também acompanha o container de 95vw,
+       com padding-left centrando no meio da coluna de 44px */
+    .tl-fio-wrap {
+        width: 95vw;
+        margin: 0 auto;
+        justify-content: flex-start;
+        padding-left: 22px;
+    }
+
+    /* Seção hero */
+    .main-row {
+        flex-direction: column;
+        min-height: auto;
+        padding: 4rem 1.5rem;
+    }
+
+    aside {
+        width: 100%;
+    }
+
+    aside div,
+    aside p {
+        width: 100%;
+    }
+
+    section {
+        width: 100%;
+    }
 }
